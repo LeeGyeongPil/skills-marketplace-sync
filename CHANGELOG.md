@@ -3,6 +3,12 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.1.2] - 2026-11-24
+
+### Fixed
+- Tests no longer depend on the machine they run on: the CLI processes they start get a clean environment (no `CI` / `GITHUB_*` / `RUNNER_*` variables, `LANG=C.UTF-8`, `TZ=UTC`, a `PATH` with only Node), so a CI runner's annotation mode, locale or installed agent CLIs cannot change the expected output.
+- CI pins `TZ=UTC` and `bash` as the run shell and prints the toolchain versions before installing.
+
 ## [0.1.1] - 2026-11-24
 
 ### Fixed

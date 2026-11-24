@@ -41,7 +41,7 @@ npm run build
 node dist/cli.js --help
 ```
 
-게시 전에 clone 을 다른 저장소에 쓰려면 `node path/to/skills-marketplace-sync/dist/cli.js sync --cwd <your-repo>` 를 실행하세요. 게시된 뒤에는 어느 저장소에서나 `npx skills-marketplace-sync <명령>` 으로 쓸 수 있습니다. 이 문서는 명령을 그 형태로 적습니다. Action 에서는 `uses: LeeGyeongPil/skills-marketplace-sync@v0.1.1` 을 씁니다.
+게시 전에 clone 을 다른 저장소에 쓰려면 `node path/to/skills-marketplace-sync/dist/cli.js sync --cwd <your-repo>` 를 실행하세요. 게시된 뒤에는 어느 저장소에서나 `npx skills-marketplace-sync <명령>` 으로 쓸 수 있습니다. 이 문서는 명령을 그 형태로 적습니다. Action 에서는 `uses: LeeGyeongPil/skills-marketplace-sync@v0.1.2` 을 씁니다.
 
 ## 빠르게 시작하기
 
@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: LeeGyeongPil/skills-marketplace-sync@v0.1.1
+      - uses: LeeGyeongPil/skills-marketplace-sync@v0.1.2
         with:
           command: check
 ```

@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (f) => readFileSync(join(root, f), "utf8");
-const VERSION = "0.1.1";
+const VERSION = "0.1.2";
 
 test("version is consistent across package, lock, changelog and READMEs", () => {
   const pkg = JSON.parse(read("package.json"));

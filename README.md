@@ -41,7 +41,7 @@ npm run build
 node dist/cli.js --help
 ```
 
-To run the clone against another repository before publishing, use `node path/to/skills-marketplace-sync/dist/cli.js sync --cwd <your-repo>`. Once published, `npx skills-marketplace-sync <command>` will work from any repository; this README writes commands in that form. In the Action, use `uses: LeeGyeongPil/skills-marketplace-sync@v0.1.1`.
+To run the clone against another repository before publishing, use `node path/to/skills-marketplace-sync/dist/cli.js sync --cwd <your-repo>`. Once published, `npx skills-marketplace-sync <command>` will work from any repository; this README writes commands in that form. In the Action, use `uses: LeeGyeongPil/skills-marketplace-sync@v0.1.2`.
 
 ## Quick start
 
@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: LeeGyeongPil/skills-marketplace-sync@v0.1.1
+      - uses: LeeGyeongPil/skills-marketplace-sync@v0.1.2
         with:
           command: check
 ```

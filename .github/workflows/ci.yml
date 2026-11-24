@@ -10,6 +10,10 @@ permissions:
   contents: read
 env:
   LANG: C.UTF-8
+  TZ: UTC
+defaults:
+  run:
+    shell: bash
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -19,6 +23,8 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "26"
+      - name: Show the toolchain (helps reading a failed run)
+        run: node --version && npm --version && git --version && uname -a
       - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
       - run: npm run test:ci
       - run: npm run check:demo

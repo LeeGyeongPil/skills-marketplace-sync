@@ -13,7 +13,7 @@ export function runClaudeValidate(root, mode, lang) {
         return { status: "skipped", output: "" };
     if (!claudeAvailable()) {
         if (mode === "true")
-            throw new UsageError(t(lang, "out.claudeSkip"));
+            throw new UsageError(t(lang, "out.claudeRequired"));
         return { status: "skipped", output: t(lang, "out.claudeSkip") };
     }
     const result = spawnSync("claude", ["plugin", "validate", root, "--strict"], {

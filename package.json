@@ -1,6 +1,6 @@
 {
   "name": "skills-marketplace-sync",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generate and verify Claude Code / Codex marketplace manifests from skills/*/SKILL.md, with a GitHub Action drift check.",
   "type": "module",
   "license": "MIT",

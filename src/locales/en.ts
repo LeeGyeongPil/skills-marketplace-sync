@@ -44,7 +44,8 @@ export const en = {
   "out.summary": "{errors} error(s), {warnings} warning(s)",
   "out.claudeOk": "claude plugin validate --strict: passed",
   "out.claudeFail": "claude plugin validate --strict failed",
-  "out.claudeSkip": "claude plugin validate skipped (claude not found in PATH)",
+  "out.claudeRequired": "--claude-validate true requires the claude CLI, but it was not found in PATH; install Claude Code or use --claude-validate auto|false",
+  "out.claudeSkip":"claude plugin validate skipped (claude not found in PATH)",
   "out.noSkills": "no skills found under {dir}/",
   // --- init ---
   "init.created": "created {file}",

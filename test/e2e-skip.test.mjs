@@ -24,3 +24,13 @@ test("e2e script and auto validate skip missing agent CLIs", () => {
   assert.equal(c.status, 0, c.stdout + c.stderr);
   assert.match(c.stdout, /OK {2}\.claude-plugin\/marketplace\.json is up to date \(3 skills\)/);
 });
+
+test("--claude-validate true without claude exits 2 and says it is required", () => {
+  const c = cli(
+    ["check", "--cwd", path.join(ROOT, "examples", "demo-skills"), "--claude-validate", "true", "--lang", "en"],
+    { env: { PATH: emptyPath } },
+  );
+  assert.equal(c.status, 2, c.stdout + c.stderr);
+  assert.match(c.stdout + c.stderr, /requires the claude CLI/);
+  assert.doesNotMatch(c.stdout + c.stderr, /skipped/);
+});

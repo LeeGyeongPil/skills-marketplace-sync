@@ -20,7 +20,7 @@ There is no mock mode: the tool only reads and writes local files, so nothing ne
 
 ## Requirements
 
-| Host / tool | Version checked | Notes |
+| Host / tool | Version tested (2026-11-24) | Notes |
 |---|---|---|
 | Node.js | v26.13.0 locally; CI runs 26; also verified on 20.20.2 | `engines.node >=20` |
 | GitHub Actions runner | `ubuntu-latest` | for the Action; the CLI works anywhere Node runs |
@@ -41,7 +41,7 @@ npm run build
 node dist/cli.js --help
 ```
 
-To run the clone against another repository before publishing, use `node path/to/skills-marketplace-sync/dist/cli.js sync --cwd <your-repo>`. Once published, `npx skills-marketplace-sync <command>` will work from any repository; this README writes commands in that form. In the Action, use `uses: LeeGyeongPil/skills-marketplace-sync@v0.1.0`.
+To run the clone against another repository before publishing, use `node path/to/skills-marketplace-sync/dist/cli.js sync --cwd <your-repo>`. Once published, `npx skills-marketplace-sync <command>` will work from any repository; this README writes commands in that form. In the Action, use `uses: LeeGyeongPil/skills-marketplace-sync@v0.1.1`.
 
 ## Quick start
 
@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: LeeGyeongPil/skills-marketplace-sync@v0.1.0
+      - uses: LeeGyeongPil/skills-marketplace-sync@v0.1.1
         with:
           command: check
 ```
@@ -120,13 +120,11 @@ jobs:
 | `config` | `skills-marketplace.yml` | config file, relative to `working-directory` |
 | `working-directory` | `.` | repository root that holds `skills/` |
 | `lang` | from environment | `en` or `ko` |
-| `claude-validate` | `auto` | also run `claude plugin validate --strict`: `auto`, `true`, `false` |
+| `claude-validate` | `auto` | also run `claude plugin validate --strict`: `auto` (only if `claude` is found), `true` (exit 2 if `claude` is missing), `false` |
 
 Outputs: `drift` (`true` or `false`) and `errors` (number of rule errors).
 
-When `GITHUB_ACTIONS=true`, each finding is also printed as a workflow command, so it appears on the changed line of the pull request:
-
-Real output of `validate` on the invalid test fixture (first three lines, `GITHUB_ACTIONS=true`). Each line becomes an inline PR annotation:
+When `GITHUB_ACTIONS=true`, each finding is also printed as a workflow command, so it appears on the changed line of the pull request. Real output of `validate` on the invalid test fixture with `GITHUB_ACTIONS=true`, first three `::error` lines (printed after the normal text output):
 
 ```text
 ::error file=skills/Bad--Name/SKILL.md,line=2,title=SMS-E002::Skill name "Bad--Name" is invalid. Use 1-64 chars of a-z, 0-9 and single hyphens, not starting or ending with a hyphen (agentskills.io/specification).
@@ -300,7 +298,7 @@ codex: 3 skills loaded (codex-cli 0.154.0)
 | `check` exits 1 with `DRIFT` | a skill was added, renamed or removed without regenerating | run `npx skills-marketplace-sync sync` and commit |
 | `SMS-E003` | folder name and `name:` differ | rename one so they are equal |
 | `SMS-E009` | root `.claude-plugin/plugin.json` conflicts with a bundle | delete it or use `mode: per-skill` |
-| Exit code 2 | missing config, unknown option, extra argument (pass the path with `--cwd`), a file that cannot be written, or YAML error | run `init`, or fix the YAML shown in the message (an unknown option prints `Unknown option ... See --help`) |
+| Exit code 2 | missing config, `--claude-validate true` without `claude` on `PATH` (message: `requires the claude CLI`), unknown option, extra argument (pass the path with `--cwd`), a file that cannot be written, or YAML error | run `init`, or fix the YAML shown in the message (an unknown option prints `Unknown option ... See --help`) |
 | Manifest checked out with CRLF line endings (Windows, `core.autocrlf`) | `check` ignores CRLF, so a `DRIFT` is a real content difference | run `sync` and commit; to keep generated files LF, add `*.json text eol=lf` to `.gitattributes` |
 | Action fails at `npm ci` | runner has no network access to the registry | allow the registry or run the CLI from a checkout |
 

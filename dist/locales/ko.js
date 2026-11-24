@@ -41,6 +41,7 @@ export const ko = {
     "out.summary": "오류 {errors}건, 경고 {warnings}건",
     "out.claudeOk": "claude plugin validate --strict: 통과",
     "out.claudeFail": "claude plugin validate --strict 실패",
+    "out.claudeRequired": "--claude-validate true 에는 claude CLI 가 필요하지만 PATH 에서 찾지 못했습니다. Claude Code 를 설치하거나 --claude-validate auto|false 를 쓰세요",
     "out.claudeSkip": "claude plugin validate 건너뜀(PATH 에 claude 없음)",
     "out.noSkills": "{dir}/ 아래에 스킬이 없습니다",
     "init.created": "{file} 생성",

@@ -41,6 +41,7 @@ export declare const en: {
     readonly "out.summary": "{errors} error(s), {warnings} warning(s)";
     readonly "out.claudeOk": "claude plugin validate --strict: passed";
     readonly "out.claudeFail": "claude plugin validate --strict failed";
+    readonly "out.claudeRequired": "--claude-validate true requires the claude CLI, but it was not found in PATH; install Claude Code or use --claude-validate auto|false";
     readonly "out.claudeSkip": "claude plugin validate skipped (claude not found in PATH)";
     readonly "out.noSkills": "no skills found under {dir}/";
     readonly "init.created": "created {file}";

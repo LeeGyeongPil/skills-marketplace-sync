@@ -1,0 +1,20 @@
+{
+  "name": "demo-skills",
+  "owner": {
+    "name": "Demo Owner"
+  },
+  "description": "Three small example skills",
+  "plugins": [
+    {
+      "name": "demo-skills",
+      "source": "./",
+      "strict": false,
+      "description": "All demo skills",
+      "skills": [
+        "./skills/commit-helper",
+        "./skills/pdf-tools",
+        "./skills/release-notes"
+      ]
+    }
+  ]
+}

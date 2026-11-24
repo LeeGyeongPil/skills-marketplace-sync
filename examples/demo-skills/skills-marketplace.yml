@@ -1,0 +1,10 @@
+name: demo-skills
+owner: { name: Demo Owner }
+description: Three small example skills
+mode: bundle
+targets: [claude, codex]
+plugin:
+  description: All demo skills
+codex:
+  displayName: Demo skills
+  category: Productivity

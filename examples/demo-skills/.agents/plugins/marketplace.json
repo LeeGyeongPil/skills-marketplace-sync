@@ -1,0 +1,20 @@
+{
+  "name": "demo-skills",
+  "interface": {
+    "displayName": "Demo skills"
+  },
+  "plugins": [
+    {
+      "name": "demo-skills",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

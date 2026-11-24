@@ -15,5 +15,5 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `npm run e2e:agents` to verify the demo output with the real Claude Code and Codex CLIs.
 
 ### Fixed
-- Unknown options and unreadable YAML now exit 2 with a clear message instead of a stack trace.
-- CI: checkout v6, explicit `node --test` test glob, minimal permissions, `.gitattributes` for stable `dist` diffs.
+- Unknown options, extra arguments, unwritable files and unreadable YAML now exit 2 with a clear message instead of a stack trace.
+- CI: one offline job on Node 26 (production-only install, tests on committed `dist/`) and `.gitattributes` for stable `dist` diffs; `npm run verify:dist` checks `dist/` locally.

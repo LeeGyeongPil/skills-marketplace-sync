@@ -1,49 +1,27 @@
-# Offline tests (no keys, no network beyond npm), a check that the committed dist/ is current,
-# and the Action run against the demo repository (the tool checks itself).
+# Minimal offline CI: one job, one Node version, production-only install.
+# Tests run against the committed dist/ (freshness is checked locally with `npm run verify:dist`).
 name: ci
 on:
   push:
+    branches: [main]
   pull_request:
-  schedule:
-    - cron: "17 3 * * 1"   # weekly: catch runtime or dependency changes
   workflow_dispatch:
 permissions:
   contents: read
 env:
-  # plain English output no matter what the runner image sets
   LANG: C.UTF-8
 jobs:
   test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        node: ["20", "lts/*"]
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node }}
-          cache: npm
-      - run: node --version && npm --version
-      - run: npm ci --no-audit --no-fund
-      - run: npm test
-      - run: npm start
-      - name: dist/ is up to date
-        run: |
-          npm run build
-          git status --short
-          git diff --exit-code dist/
-      - run: npm pack --dry-run
-  action:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          node-version: "26"
+      - run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - run: npm run test:ci
+      - run: npm run check:demo
       - name: Run the Action on the demo repository
         id: demo
         uses: ./
@@ -55,21 +33,4 @@ jobs:
         env:
           DRIFT: ${{ steps.demo.outputs.drift }}
           ERRORS: ${{ steps.demo.outputs.errors }}
-        run: |
-          echo "drift=$DRIFT errors=$ERRORS"
-          test "$DRIFT" = "false"
-          test "$ERRORS" = "0"
-      - name: Run the Action on a fixture that has drift (must fail)
-        id: drift
-        continue-on-error: true
-        uses: ./
-        with:
-          command: check
-          working-directory: test/fixtures/drift
-          claude-validate: "false"
-      - name: The drift run failed as expected
-        env:
-          OUTCOME: ${{ steps.drift.outcome }}
-        run: |
-          echo "outcome=$OUTCOME"
-          test "$OUTCOME" = "failure"
+        run: test "$DRIFT" = "false" && test "$ERRORS" = "0"

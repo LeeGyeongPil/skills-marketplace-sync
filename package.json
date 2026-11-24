@@ -31,7 +31,10 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && node --test test/*.test.mjs",
+    "test:ci": "node --test test/*.test.mjs",
     "start": "npm run build && node dist/cli.js check --cwd examples/demo-skills --claude-validate false --lang en",
+    "check:demo": "node dist/cli.js check --cwd examples/demo-skills --claude-validate false --lang en",
+    "verify:dist": "npm run build && git diff --exit-code dist/",
     "e2e:agents": "npm run build && node scripts/e2e-agents.mjs"
   },
   "keywords": [

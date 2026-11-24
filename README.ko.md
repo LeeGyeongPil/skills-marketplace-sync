@@ -22,7 +22,7 @@
 
 | 호스트 / 도구 | 확인한 버전 | 비고 |
 |---|---|---|
-| Node.js | 로컬 v26.13.0, CI 는 20 과 lts | `engines.node >=20` |
+| Node.js | 로컬 v26.13.0, CI 는 26, 20.20.2 에서도 확인 | `engines.node >=20` |
 | GitHub Actions 러너 | `ubuntu-latest` | Action 용. CLI 는 Node 가 있는 곳이면 어디서나 |
 | Claude Code | 2.1.322 | 선택: `claude` 가 `PATH` 에 있으면 우리 검사 뒤에 `claude plugin validate --strict` 도 실행 |
 | codex-cli | 0.154.0 | 선택: `npm run e2e:agents` 에서만 사용 |
@@ -41,7 +41,7 @@ npm run build
 node dist/cli.js --help
 ```
 
-게시된 뒤에는 어느 저장소에서나 `npx skills-marketplace-sync <명령>` 으로 쓸 수 있습니다. 이 문서는 명령을 그 형태로 적습니다. Action 에서는 `uses: LeeGyeongPil/skills-marketplace-sync@v0.1.0` 을 씁니다.
+게시 전에 clone 을 다른 저장소에 쓰려면 `node path/to/skills-marketplace-sync/dist/cli.js sync --cwd <your-repo>` 를 실행하세요. 게시된 뒤에는 어느 저장소에서나 `npx skills-marketplace-sync <명령>` 으로 쓸 수 있습니다. 이 문서는 명령을 그 형태로 적습니다. Action 에서는 `uses: LeeGyeongPil/skills-marketplace-sync@v0.1.0` 을 씁니다.
 
 ## 빠르게 시작하기
 
@@ -126,7 +126,13 @@ jobs:
 
 `GITHUB_ACTIONS=true` 이면 각 진단이 워크플로 명령으로도 출력되어 풀 리퀘스트의 해당 줄에 주석으로 나타납니다.
 
-![규칙 오류를 주석 줄로 출력한 화면](docs/images/04-ci-annotation.ko.png)
+`validate` 를 잘못된 테스트 픽스처에 실행한 실제 출력입니다(`GITHUB_ACTIONS=true`, 앞 세 줄). 각 줄이 PR 의 인라인 주석이 됩니다.
+
+```text
+::error file=skills/Bad--Name/SKILL.md,line=2,title=SMS-E002::스킬 이름 "Bad--Name" 이(가) 규칙에 맞지 않습니다. 소문자·숫자·하이픈 1~64자, 하이픈으로 시작·끝 금지, 연속 하이픈 금지(agentskills.io/specification).
+::error file=skills/bad-frontmatter/SKILL.md,line=1,title=SMS-E001::SKILL.md 에 올바른 YAML 프론트매터가 없습니다(--- 블록 없음). 파일 맨 위에 name 과 description 이 있는 --- 블록을 쓰세요.
+::error file=skills/long-compat/SKILL.md,line=4,title=SMS-E005::compatibility 값이 올바르지 않습니다: compatibility 는 500자 이하 문자열이어야 함.
+```
 *각 줄이 PR 인라인 주석이 됩니다: `::error file=...,line=...,title=SMS-E002::메시지`.*
 
 ## 사용법
@@ -181,7 +187,7 @@ error   SMS-E002  skills/Bad--Name/SKILL.md:2  Skill name "Bad--Name" is invalid
 *`sync` 뒤의 diff: `./skills/gone` 만 빠지고 손으로 쓴 내용은 그대로입니다.*
 
 - 관리 키: 최상위 `name`, `owner`, `description`(설정에 있을 때). bundle 항목의 `name`, `source`, `strict`, `skills`. per-skill 항목은 `description` 도. Codex 파일은 `name`, `interface.displayName`, 항목 `name`, `source`, `policy`, `category`.
-- 그 밖의 키(`version`, `keywords`, `homepage`, `author`, `$schema`, `renames`, 모르는 키)는 값을 그대로 둡니다.
+- 그 밖의 키(`version`, `keywords`, `homepage`, `author`, `$schema`, `renames`, 모르는 키)는 값을 그대로 둡니다. 첫 `sync` 에서 관리하는 항목의 키 순서가 표준 순서로 정리될 수 있습니다(예: `skills` 뒤에 둔 `version`). 값은 바뀌지 않습니다.
 - 도구가 관리하지 않는 항목(원격 소스, 다른 폴더)은 그 자리에서 손대지 않습니다.
 
 ### bundle 과 per-skill
@@ -295,7 +301,7 @@ codex: 3 skills loaded (codex-cli 0.154.0)
 | `check` 가 `DRIFT` 와 함께 exit 1 | 스킬을 추가·이름 변경·삭제하고 재생성하지 않음 | `npx skills-marketplace-sync sync` 실행 후 커밋 |
 | `SMS-E003` | 폴더 이름과 `name:` 이 다름 | 둘을 같게 맞춤 |
 | `SMS-E009` | 루트 `.claude-plugin/plugin.json` 이 bundle 과 충돌 | 삭제하거나 `mode: per-skill` 사용 |
-| 종료 코드 2 | 설정 없음, 알 수 없는 옵션, YAML 오류 | `init` 을 실행하거나 메시지가 알려 준 YAML 을 고침(알 수 없는 옵션은 `--help` 를 안내하는 메시지가 나옴) |
+| 종료 코드 2 | 설정 없음, 알 수 없는 옵션, 여분 인자(경로는 `--cwd` 로), 쓸 수 없는 파일, YAML 오류 | `init` 을 실행하거나 메시지가 알려 준 YAML 을 고침(알 수 없는 옵션은 `--help` 를 안내하는 메시지가 나옴) |
 | 매니페스트가 CRLF 줄바꿈으로 체크아웃됨(Windows, `core.autocrlf`) | `check` 는 CRLF 를 무시하므로 `DRIFT` 는 실제 내용 차이 | `sync` 후 커밋. 생성 파일을 LF 로 유지하려면 `.gitattributes` 에 `*.json text eol=lf` 추가 |
 | Action 이 `npm ci` 에서 실패 | 러너가 레지스트리에 접근하지 못함 | 레지스트리를 허용하거나 체크아웃에서 CLI 를 직접 실행 |
 
@@ -303,11 +309,11 @@ codex: 3 skills loaded (codex-cli 0.154.0)
 
 ```bash
 npm ci
-npm test        # 빌드 후 node --test 실행 (오프라인 테스트 24개)
+npm test        # 빌드 후 node --test 실행 (오프라인)
 npm start       # examples/demo-skills 검사
 ```
 
-Action 이 실행하므로 `dist/` 는 커밋되어 있고, 오래되면 CI 가 실패합니다(`npm run build && git diff --exit-code dist/`). 변경 기록은 [CHANGELOG.md](CHANGELOG.md).
+Action 이 실행하므로 `dist/` 는 커밋되어 있고, 릴리스 전에 `npm run verify:dist`(빌드 후 `git diff --exit-code dist/`)로 확인합니다. 변경 기록은 [CHANGELOG.md](CHANGELOG.md).
 
 ## 라이선스
 

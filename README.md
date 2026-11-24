@@ -22,7 +22,7 @@ There is no mock mode: the tool only reads and writes local files, so nothing ne
 
 | Host / tool | Version checked | Notes |
 |---|---|---|
-| Node.js | v26.13.0 locally; CI runs 20 and lts | `engines.node >=20` |
+| Node.js | v26.13.0 locally; CI runs 26; also verified on 20.20.2 | `engines.node >=20` |
 | GitHub Actions runner | `ubuntu-latest` | for the Action; the CLI works anywhere Node runs |
 | Claude Code | 2.1.322 | optional: `claude plugin validate --strict` runs after our checks when `claude` is on `PATH` |
 | codex-cli | 0.154.0 | optional: only used by `npm run e2e:agents` |
@@ -41,7 +41,7 @@ npm run build
 node dist/cli.js --help
 ```
 
-Once published, `npx skills-marketplace-sync <command>` will work from any repository; this README writes commands in that form. In the Action, use `uses: LeeGyeongPil/skills-marketplace-sync@v0.1.0`.
+To run the clone against another repository before publishing, use `node path/to/skills-marketplace-sync/dist/cli.js sync --cwd <your-repo>`. Once published, `npx skills-marketplace-sync <command>` will work from any repository; this README writes commands in that form. In the Action, use `uses: LeeGyeongPil/skills-marketplace-sync@v0.1.0`.
 
 ## Quick start
 
@@ -126,8 +126,13 @@ Outputs: `drift` (`true` or `false`) and `errors` (number of rule errors).
 
 When `GITHUB_ACTIONS=true`, each finding is also printed as a workflow command, so it appears on the changed line of the pull request:
 
-![annotation lines printed for rule errors](docs/images/04-ci-annotation.png)
-*Each line becomes an inline PR annotation: `::error file=...,line=...,title=SMS-E002::message`.*
+Real output of `validate` on the invalid test fixture (first three lines, `GITHUB_ACTIONS=true`). Each line becomes an inline PR annotation:
+
+```text
+::error file=skills/Bad--Name/SKILL.md,line=2,title=SMS-E002::Skill name "Bad--Name" is invalid. Use 1-64 chars of a-z, 0-9 and single hyphens, not starting or ending with a hyphen (agentskills.io/specification).
+::error file=skills/bad-frontmatter/SKILL.md,line=1,title=SMS-E001::SKILL.md has no valid YAML frontmatter (no --- block). Start the file with a --- block containing name and description.
+::error file=skills/long-compat/SKILL.md,line=4,title=SMS-E005::compatibility is invalid: compatibility must be a string of at most 500 characters.
+```
 
 ## Usage
 
@@ -181,7 +186,7 @@ Skills that violate a rule are left out of the generated manifest, the file is s
 *The diff after `sync`: `./skills/gone` is dropped, everything hand-written stays.*
 
 - Managed keys: top-level `name`, `owner`, `description` (when set in the config); in the bundle entry `name`, `source`, `strict`, `skills`; in per-skill entries also `description`. Codex file: `name`, `interface.displayName`, entry `name`, `source`, `policy`, `category`.
-- Everything else (`version`, `keywords`, `homepage`, `author`, `$schema`, `renames`, unknown keys) keeps its value.
+- Everything else (`version`, `keywords`, `homepage`, `author`, `$schema`, `renames`, unknown keys) keeps its value. The first `sync` may reorder keys of the entry it manages into the standard order (for example a `version` placed after `skills`); values are not changed.
 - Entries the tool does not manage (remote sources, other folders) stay untouched, in place.
 
 ### Bundle vs per-skill
@@ -295,7 +300,7 @@ codex: 3 skills loaded (codex-cli 0.154.0)
 | `check` exits 1 with `DRIFT` | a skill was added, renamed or removed without regenerating | run `npx skills-marketplace-sync sync` and commit |
 | `SMS-E003` | folder name and `name:` differ | rename one so they are equal |
 | `SMS-E009` | root `.claude-plugin/plugin.json` conflicts with a bundle | delete it or use `mode: per-skill` |
-| Exit code 2 | missing config, unknown option or YAML error | run `init`, or fix the YAML shown in the message (an unknown option prints `Unknown option ... See --help`) |
+| Exit code 2 | missing config, unknown option, extra argument (pass the path with `--cwd`), a file that cannot be written, or YAML error | run `init`, or fix the YAML shown in the message (an unknown option prints `Unknown option ... See --help`) |
 | Manifest checked out with CRLF line endings (Windows, `core.autocrlf`) | `check` ignores CRLF, so a `DRIFT` is a real content difference | run `sync` and commit; to keep generated files LF, add `*.json text eol=lf` to `.gitattributes` |
 | Action fails at `npm ci` | runner has no network access to the registry | allow the registry or run the CLI from a checkout |
 
@@ -303,11 +308,11 @@ codex: 3 skills loaded (codex-cli 0.154.0)
 
 ```bash
 npm ci
-npm test        # builds, then runs node --test (24 tests, offline)
+npm test        # builds, then runs node --test (offline)
 npm start       # checks examples/demo-skills
 ```
 
-`dist/` is committed because the Action runs it; CI fails if it is stale (`npm run build && git diff --exit-code dist/`). Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+`dist/` is committed because the Action runs it; check it before release with `npm run verify:dist` (build plus `git diff --exit-code dist/`). Changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

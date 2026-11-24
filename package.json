@@ -1,0 +1,52 @@
+{
+  "name": "skills-marketplace-sync",
+  "version": "0.1.0",
+  "description": "Generate and verify Claude Code / Codex marketplace manifests from skills/*/SKILL.md, with a GitHub Action drift check.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeeGyeongPil/skills-marketplace-sync.git"
+  },
+  "homepage": "https://github.com/LeeGyeongPil/skills-marketplace-sync#readme",
+  "bugs": {
+    "url": "https://github.com/LeeGyeongPil/skills-marketplace-sync/issues"
+  },
+  "bin": {
+    "skills-marketplace-sync": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "action.yml",
+    "README.md",
+    "README.ko.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/",
+    "start": "npm run build && node dist/cli.js check --cwd examples/demo-skills --claude-validate false --lang en",
+    "e2e:agents": "npm run build && node scripts/e2e-agents.mjs"
+  },
+  "keywords": [
+    "agent-skills",
+    "claude-code",
+    "codex",
+    "marketplace",
+    "github-action",
+    "skill"
+  ],
+  "dependencies": {
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "typescript": "7.0.2"
+  }
+}

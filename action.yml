@@ -1,0 +1,53 @@
+name: Skills Marketplace Sync
+description: Generate or verify Claude Code / Codex marketplace manifests from skills/*/SKILL.md and fail the PR when they drift.
+author: skills-marketplace-sync contributors
+branding:
+  icon: check-circle
+  color: blue
+inputs:
+  command:
+    description: "check (default, fails on drift), sync (write the manifests) or validate (rules only)"
+    required: false
+    default: check
+  config:
+    description: Config file, relative to working-directory
+    required: false
+    default: skills-marketplace.yml
+  working-directory:
+    description: Repository root that holds skills/ and the config file
+    required: false
+    default: "."
+  lang:
+    description: "Message language: en or ko (default: from the environment, otherwise en)"
+    required: false
+    default: ""
+  claude-validate:
+    description: "Also run `claude plugin validate --strict`: auto (only if claude is on PATH), true or false"
+    required: false
+    default: auto
+outputs:
+  drift:
+    description: "true when the committed manifests differ from the generated ones"
+    value: ${{ steps.run.outputs.drift }}
+  errors:
+    description: Number of rule errors found
+    value: ${{ steps.run.outputs.errors }}
+runs:
+  using: composite
+  steps:
+    - name: Install runtime dependency (yaml)
+      shell: bash
+      run: npm ci --omit=dev --ignore-scripts --no-audit --no-fund --prefix "$GITHUB_ACTION_PATH"
+    - name: Run skills-marketplace-sync
+      id: run
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        INPUT_COMMAND: ${{ inputs.command }}
+        INPUT_CONFIG: ${{ inputs.config }}
+        INPUT_LANG: ${{ inputs.lang }}
+        INPUT_CLAUDE_VALIDATE: ${{ inputs.claude-validate }}
+      run: |
+        args=("$INPUT_COMMAND" --config "$INPUT_CONFIG" --claude-validate "$INPUT_CLAUDE_VALIDATE")
+        if [ -n "$INPUT_LANG" ]; then args+=(--lang "$INPUT_LANG"); fi
+        node "$GITHUB_ACTION_PATH/dist/cli.js" "${args[@]}"

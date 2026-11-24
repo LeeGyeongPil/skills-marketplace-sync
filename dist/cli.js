@@ -1,0 +1,110 @@
+#!/usr/bin/env node
+import { parseArgs } from "node:util";
+import { initConfig, run } from "./index.js";
+import { resolveLang, t } from "./i18n.js";
+import { annotations, formatJson, formatText, writeGithubOutput } from "./report.js";
+import { UsageError } from "./types.js";
+const COMMANDS = ["init", "sync", "check", "validate"];
+/** Find --lang before full parsing so even option errors are shown in the chosen language. */
+function earlyLang(argv) {
+    const i = argv.findIndex((a) => a === "--lang" || a.startsWith("--lang="));
+    let value;
+    if (i >= 0)
+        value = argv[i].includes("=") ? argv[i].split("=")[1] : argv[i + 1];
+    return resolveLang(value);
+}
+/** Turn a Node parseArgs error into a message in the chosen language. */
+function optionError(lang, code, detail) {
+    const quoted = /'([^']*)'/.exec(detail)?.[1] ?? "";
+    if (code === "ERR_PARSE_ARGS_UNKNOWN_OPTION") {
+        return t(lang, "err.unknownOption", { option: quoted });
+    }
+    if (code === "ERR_PARSE_ARGS_INVALID_OPTION_VALUE") {
+        return t(lang, "err.missingValue", { option: quoted.split(" ")[0] });
+    }
+    if (code === "ERR_PARSE_ARGS_UNEXPECTED_POSITIONAL") {
+        return t(lang, "err.unexpectedArg", { arg: quoted });
+    }
+    return t(lang, "err.option", { detail });
+}
+function main(argv) {
+    const lang = earlyLang(argv);
+    try {
+        const { values, positionals } = parseArgs({
+            args: argv,
+            allowPositionals: true,
+            strict: true,
+            options: {
+                cwd: { type: "string" },
+                config: { type: "string" },
+                format: { type: "string" },
+                "claude-validate": { type: "string" },
+                lang: { type: "string" },
+                name: { type: "string" },
+                owner: { type: "string" },
+                mode: { type: "string" },
+                targets: { type: "string" },
+                help: { type: "boolean", short: "h" },
+            },
+        });
+        if (values.help) {
+            console.log(t(lang, "help.text"));
+            return 0;
+        }
+        const command = positionals[0];
+        if (!command)
+            throw new UsageError(t(lang, "err.noCommand"));
+        if (!COMMANDS.includes(command)) {
+            throw new UsageError(t(lang, "err.unknownCommand", { command }));
+        }
+        const choose = (option, value, allowed) => {
+            if (value !== undefined && !allowed.includes(value)) {
+                throw new UsageError(t(lang, "err.badValue", { option, value, allowed: allowed.join(", ") }));
+            }
+        };
+        choose("--lang", values.lang, ["en", "ko"]);
+        choose("--format", values.format, ["text", "json"]);
+        choose("--claude-validate", values["claude-validate"], ["auto", "true", "false"]);
+        const options = {
+            cwd: values.cwd,
+            config: values.config,
+            lang,
+            claudeValidate: (values["claude-validate"] ?? "auto"),
+        };
+        if (command === "init") {
+            const { file } = initConfig({ ...options, name: values.name, owner: values.owner, mode: values.mode, targets: values.targets });
+            console.log(t(lang, "init.created", { file }));
+            console.log(t(lang, "init.next"));
+            return 0;
+        }
+        const result = run(command, options);
+        writeGithubOutput(process.env.GITHUB_OUTPUT, result);
+        if (values.format === "json") {
+            console.log(formatJson(result));
+        }
+        else {
+            const text = formatText(result);
+            if (text)
+                console.log(text);
+            if (process.env.GITHUB_ACTIONS === "true") {
+                for (const line of annotations(result))
+                    console.log(line);
+            }
+        }
+        return result.exitCode;
+    }
+    catch (error) {
+        if (error instanceof UsageError) {
+            console.error(error.message);
+            return 2;
+        }
+        // parseArgs errors (unknown option, missing value) are usage errors too
+        const code = error.code;
+        if (typeof code === "string" && code.startsWith("ERR_PARSE_ARGS")) {
+            console.error(optionError(lang, code, error.message));
+            return 2;
+        }
+        throw error;
+    }
+}
+process.exitCode = main(process.argv.slice(2));

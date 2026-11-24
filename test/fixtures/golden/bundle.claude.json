@@ -1,0 +1,20 @@
+{
+  "name": "example-skills",
+  "owner": {
+    "name": "Example Owner"
+  },
+  "description": "Example skills",
+  "plugins": [
+    {
+      "name": "example-skills",
+      "source": "./",
+      "strict": false,
+      "description": "All example skills",
+      "skills": [
+        "./skills/commit-helper",
+        "./skills/pdf-tools",
+        "./skills/release-notes"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+name: example-skills
+owner: { name: Example Owner }
+description: Example skills
+mode: bundle
+targets: [claude]
+plugin:
+  description: All example skills

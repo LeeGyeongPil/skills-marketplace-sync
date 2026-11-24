@@ -1,0 +1,5 @@
+name: codex-skills
+owner: { name: Example Owner }
+description: Codex example
+mode: per-skill
+targets: [claude]

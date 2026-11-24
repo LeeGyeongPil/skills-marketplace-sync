@@ -1,0 +1,4 @@
+name: drift-skills
+owner: { name: Example Owner }
+description: Drift example
+mode: bundle

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "human-skills",
+  "owner": {
+    "name": "Example Owner"
+  },
+  "description": "Human fields example",
+  "plugins": [
+    {
+      "name": "human-skills",
+      "source": "./",
+      "strict": false,
+      "description": "Bundle",
+      "version": "1.2.3",
+      "skills": [
+        "./skills/gone",
+        "./skills/keep-a",
+        "./skills/keep-b"
+      ],
+      "keywords": [
+        "review",
+        "git"
+      ],
+      "homepage": "https://example.com/human-skills"
+    },
+    {
+      "name": "external-tool",
+      "source": {
+        "source": "github",
+        "repo": "example/external-tool"
+      },
+      "description": "Hand-written"
+    }
+  ],
+  "renames": {
+    "old-name": "human-skills"
+  }
+}

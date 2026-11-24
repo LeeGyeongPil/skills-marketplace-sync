@@ -1,0 +1,9 @@
+name: codex-skills
+owner: { name: Example Owner }
+description: Codex example
+mode: bundle
+targets: [claude, codex]
+plugin:
+  name: My_Plugin
+codex:
+  policy: { installation: SOMETIMES, authentication: ON_INSTALL }

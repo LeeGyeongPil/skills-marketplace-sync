@@ -1,0 +1,6 @@
+name: human-skills
+owner: { name: Example Owner }
+description: Human fields example
+mode: bundle
+plugin:
+  description: Bundle

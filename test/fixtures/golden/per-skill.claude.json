@@ -1,0 +1,24 @@
+{
+  "name": "example-skills",
+  "owner": {
+    "name": "Example Owner"
+  },
+  "description": "Example skills",
+  "plugins": [
+    {
+      "name": "commit-helper",
+      "source": "./skills/commit-helper",
+      "description": "Writes conventional commit messages from a staged diff. Use when the user asks for a commit message."
+    },
+    {
+      "name": "pdf-tools",
+      "source": "./skills/pdf-tools",
+      "description": "Extracts text and tables from PDF files. Use when the user mentions a PDF."
+    },
+    {
+      "name": "release-notes",
+      "source": "./skills/release-notes",
+      "description": "Drafts release notes from merged pull requests. Use when preparing a release."
+    }
+  ]
+}

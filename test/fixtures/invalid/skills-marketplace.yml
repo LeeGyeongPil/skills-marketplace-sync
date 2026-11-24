@@ -1,0 +1,4 @@
+name: agent-skills
+owner: { name: Example Owner }
+description: Invalid example
+mode: bundle

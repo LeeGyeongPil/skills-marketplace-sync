@@ -57,6 +57,10 @@ function main(argv) {
         if (!COMMANDS.includes(command)) {
             throw new UsageError(t(lang, "err.unknownCommand", { command }));
         }
+        // `check ./repo` 처럼 경로를 위치 인자로 주면 조용히 무시되지 않도록 막는다.
+        if (positionals.length > 1) {
+            throw new UsageError(t(lang, "err.extraArgs", { args: positionals.slice(1).join(" ") }));
+        }
         const choose = (option, value, allowed) => {
             if (value !== undefined && !allowed.includes(value)) {
                 throw new UsageError(t(lang, "err.badValue", { option, value, allowed: allowed.join(", ") }));

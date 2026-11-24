@@ -29,6 +29,19 @@ function normalizeEol(text: string): string {
   return text.replace(/\r\n/g, "\n");
 }
 
+/** 파일 쓰기 실패(권한·읽기 전용·디스크 부족)를 스택 대신 사용 오류(exit 2)로 바꾼다. */
+const WRITE_ERRORS = new Set(["EACCES", "EPERM", "EROFS", "ENOSPC", "EISDIR", "ENOTDIR"]);
+function writeFile(target: string, body: string, lang: Lang): void {
+  try {
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, body);
+  } catch (error) {
+    const code = (error as { code?: string }).code ?? "";
+    if (WRITE_ERRORS.has(code)) throw new UsageError(t(lang, "err.write", { file: target, code }));
+    throw error;
+  }
+}
+
 function readIfExists(file: string): string | null {
   return fs.existsSync(file) ? fs.readFileSync(file, "utf8") : null;
 }
@@ -120,8 +133,7 @@ export function run(command: Exclude<Command, "init">, options: RunOptions = {})
       for (const name of out.removed) notes.push(t(lang, "out.removed", { name, path: out.path }));
       if (out.content !== out.existing) {
         const target = path.join(root, out.path);
-        fs.mkdirSync(path.dirname(target), { recursive: true });
-        fs.writeFileSync(target, out.content);
+        writeFile(target, out.content, lang);
         written.push(out.path);
         notes.push(t(lang, "out.wrote", { path: out.path, count }));
       } else {
@@ -197,7 +209,6 @@ export function initConfig(
     `targets: [${targets.join(", ")}]`,
     "",
   ].join("\n");
-  fs.mkdirSync(path.dirname(target), { recursive: true });
-  fs.writeFileSync(target, body);
+  writeFile(target, body, lang);
   return { file: configFile };
 }

@@ -63,6 +63,8 @@ export const ko: Record<MessageKey, string> = {
   "err.manifestParse": "기존 {file} 을(를) 해석할 수 없습니다({detail}). JSON 을 고치거나 파일을 지운 뒤 sync 하세요.",
   "err.codexSkillsDir": "{file}: codex 대상은 skillsDir: skills 여야 합니다(Codex 는 skills/ 폴더를 로드). 현재 \"{dir}\".",
   "err.cwd": "디렉터리 {dir} 이(가) 없습니다.",
+  "err.write": "{file} 을(를) 쓸 수 없습니다({code}). 폴더 권한을 확인하거나 --cwd 로 다른 폴더를 지정하세요.",
+  "err.extraArgs": "인자가 너무 많습니다: \"{args}\". 명령은 하나만 쓰고, 레포 경로는 --cwd 로 지정하세요.",
   "config.requiredName": "name 이 필요합니다(마켓플레이스 이름)",
   "config.requiredOwner": "owner.name 이 필요합니다",
   "config.mode": "mode 는 bundle 또는 per-skill 이어야 합니다",

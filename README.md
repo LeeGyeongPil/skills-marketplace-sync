@@ -303,7 +303,7 @@ codex: 3 skills loaded (codex-cli 0.154.0)
 
 ```bash
 npm ci
-npm test        # builds, then runs node --test (22 tests, offline)
+npm test        # builds, then runs node --test (24 tests, offline)
 npm start       # checks examples/demo-skills
 ```
 

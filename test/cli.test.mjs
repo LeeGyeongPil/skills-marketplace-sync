@@ -102,3 +102,33 @@ test("CRLF line endings in a manifest are not drift", () => {
   const result = cli(["check", "--cwd", dir, "--claude-validate", "false", "--lang", "en"]);
   assert.equal(result.status, 0, result.stdout);
 });
+
+test("extra positional arguments are a usage error", () => {
+  const en = cli(["check", "extra", "--cwd", "examples/demo-skills", "--claude-validate", "false", "--lang", "en"]);
+  assert.equal(en.status, 2);
+  assert.match(en.stderr, /Too many arguments: "extra"\. .*--cwd/);
+  const ko = cli(["check", "extra", "--lang", "ko"]);
+  assert.equal(ko.status, 2);
+  assert.match(ko.stderr, /인자가 너무 많습니다/);
+});
+
+test("a write failure is a localized usage error, not a stack trace", (t) => {
+  // root ignores folder permissions (some containers), so the check only means something for normal users
+  if (process.platform === "win32" || process.getuid?.() === 0) {
+    t.skip("folder permissions are not enforced for this user");
+    return;
+  }
+  const dir = tmp();
+  fs.chmodSync(dir, 0o555);
+  try {
+    const en = cli(["init", "--cwd", dir, "--name", "x", "--owner", "y", "--lang", "en"]);
+    assert.equal(en.status, 2, en.stderr);
+    assert.match(en.stderr, /Cannot write .*skills-marketplace\.yml \(EACCES\)/);
+    assert.doesNotMatch(en.stderr, /node:fs|at Object\./);
+    const ko = cli(["init", "--cwd", dir, "--name", "x", "--owner", "y", "--lang", "ko"]);
+    assert.equal(ko.status, 2);
+    assert.match(ko.stderr, /쓸 수 없습니다/);
+  } finally {
+    fs.chmodSync(dir, 0o755);
+  }
+});

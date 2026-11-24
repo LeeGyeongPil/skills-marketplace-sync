@@ -61,6 +61,8 @@ export declare const en: {
     readonly "err.manifestParse": "Cannot parse existing {file} ({detail}). Fix the JSON or delete the file, then run sync.";
     readonly "err.codexSkillsDir": "{file}: the codex target needs skillsDir: skills (Codex loads the skills/ folder), got \"{dir}\".";
     readonly "err.cwd": "Directory {dir} does not exist.";
+    readonly "err.write": "Cannot write {file} ({code}). Check the folder permissions or pick another folder with --cwd.";
+    readonly "err.extraArgs": "Too many arguments: \"{args}\". Give one command; pass the repository path with --cwd.";
     readonly "config.requiredName": "name is required (the marketplace name)";
     readonly "config.requiredOwner": "owner.name is required";
     readonly "config.mode": "mode must be bundle or per-skill";
